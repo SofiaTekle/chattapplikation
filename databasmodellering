@@ -1,0 +1,84 @@
+Utgår från dem befintliga klasserna User och Message som kommer att
+utökas med kommentarer, profiler och taggar.
+
+Konceptuell modell:
+
+Befintliga entiteter -
+User (representerar en användare)
+Message (representerar chattmeddelande)
+
+Relation:
+User 1 - * Message (1 user kan skriva många medd)
+Message 1 - 1 User (ett medd skrivs av en user)
+
+
+Ny funktionalitet
+
+Ny entitet - Comment
+- En kommentar hör till ett meddelande
+- Skrivs av exakt en användare
+- Ett medd kan ha flera kommentarer
+- En användare (user) kan skriva flera kommentarer
+
+Ny entitet - Profile
+- En användare har en profil
+- En profil hör till en användare
+
+Ny entitet - Tag
+- Medd kan märkas med taggar
+- Samma tagg kan användas på flera medd
+- Ett medd kan ha flera taggar
+- representerar ett ämne
+- relation många till många mellan message och tag
+
+Relationer
+User 1 — * Message
+User 1 — * Comment
+Message 1 — * Comment
+User 1 — 1 Profile
+Message * — * Tag
+
+
+
+Logisk modell:
+User(id(PK),username, password)
+Message(id(PK), text, timestamp, user_id (FK → User.id))
+Comment(id(PK), text, timestamp, user_id (FK → User.id), message_id (FK → Message.id))
+Profile(id(PK), profile_image, description, user_id (FK → User.id, UNIQUE))
+Tag(id(PK), name (UNIQUE))
+Message_Tag((kopplingstabell)message_id (FK → Message.id), tag_id (FK → Tag.id)(PK: message_id, tag_id))
+
+
+Fysisk modell (SQL)
+
+CREATE TABLE comments (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    text TEXT NOT NULL,
+    timestamp DATETIME NOT NULL,
+    user_id BIGINT NOT NULL,
+    message_id BIGINT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (message_id) REFERENCES messages(id)
+);
+
+CREATE TABLE profiles (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    profile_image VARCHAR(255),
+    description TEXT,
+    user_id BIGINT NOT NULL UNIQUE,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE tags (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE message_tags (
+    message_id BIGINT NOT NULL,
+    tag_id BIGINT NOT NULL,
+    PRIMARY KEY (message_id, tag_id),
+    FOREIGN KEY (message_id) REFERENCES messages(id),
+    FOREIGN KEY (tag_id) REFERENCES tags(id)
+);
+

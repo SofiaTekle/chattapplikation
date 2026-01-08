@@ -13,14 +13,29 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ClientHandler hanterar all kommunikation med en enskild klient:
+inloggning, kommandon och chattmeddelanden.
+Den läser input från klienten via socketen, skickar output tillbaka
+till klienten och använder ChatServer för att distribuera meddelanden
+till andra klienter.
+ */
+
+
+
 public class ClientHandler implements Runnable {
 
     private final Socket socket;
+
     private final ChatServer server;
+
     private final UserService userService;
     private final MessageService messageService;
 
+    // Writer används för att skicka data till klienten.
     private PrintWriter out;
+
+    // Den inloggade användaren för denna klient.
     private User user;
 
     public ClientHandler(Socket socket,
@@ -37,8 +52,22 @@ public class ClientHandler implements Runnable {
         return user;
     }
 
+
+
+    /**
+     * Körs i en egen tråd.
+     * Hanterar HELA livscykeln för en klient:
+     * - inloggning / registrering
+     * - ta emot meddelanden
+     * - spara meddelanden
+     * - avslut
+     */
+
+
     @Override
     public void run() {
+
+        // läser och skriver input/output
         try (
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(socket.getInputStream()));
@@ -47,6 +76,7 @@ public class ClientHandler implements Runnable {
 
             this.out = writer;
 
+            // Inloggning/ Registering
             writer.println("Välkommen! Har du redan ett konto? (ja/nej)");
             String answer = in.readLine();
             boolean existingUser = false;
@@ -81,6 +111,8 @@ public class ClientHandler implements Runnable {
 
             writer.println("Du är inloggad som: " + user.getUsername());
 
+
+            // Visa tidigare meddelanden för befintlig användare
             if (existingUser) {
                 List<Message> messageForUser = user.getMessages();
                 if (messageForUser != null && !messageForUser.isEmpty()) {
@@ -95,6 +127,7 @@ public class ClientHandler implements Runnable {
             writer.println("/mymsgs visar dina meddelanden.");
             writer.println("/quit avslutar sessionen.");
 
+            // Huvudloop: lyssnar på klientens input
             String msg;
             while ((msg = in.readLine()) != null) {
 
@@ -120,6 +153,7 @@ public class ClientHandler implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
+            // Städar när klienten kopplar ner
             server.removeClient(this);
             try {
                 socket.close();
@@ -127,6 +161,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    // Skickar ett meddelande till klienten
     public void sendMessage(String msg) {
         if (out != null) out.println(msg);
     }
