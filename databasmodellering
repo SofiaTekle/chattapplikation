@@ -38,8 +38,6 @@ Message 1 — * Comment
 User 1 — 1 Profile
 Message * — * Tag
 
-
-
 Logisk modell:
 User(id(PK),username, password)
 Message(id(PK), text, timestamp, user_id (FK → User.id))
