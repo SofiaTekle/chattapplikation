@@ -17,7 +17,7 @@ A simple client-server chat application built with **Java**, **Spring Boot**, an
   - `/quit` - Exit the chat  
 
 ### Database Storage
-- Messages are stored in a database using **JPA/Hibernate**.  
+- Messages are stored in a **MySQL database** using **JPA/Hibernate**.  
 - Users and messages are related via a **One-to-Many relationship**.  
 
 ### Multithreading
@@ -27,14 +27,16 @@ A simple client-server chat application built with **Java**, **Spring Boot**, an
   2. Reads user input from the console  
 
 ### Testing
-- Unit and mock tests are available for `UserService` and `MessageService`.  
+- Unit and mock tests are available for `UserService` and `MessageService`.
+- Tests use **JUnit 5** and **Mockito** to mock database repositories.  
 
 ---
 
 ## Technologies
 - Java 17  
 - Spring Boot 3  
-- JPA/Hibernate  
+- JPA/Hibernate
+- MySQL
 - Socket programming (TCP)  
 - JUnit 5 + Mockito  
 
